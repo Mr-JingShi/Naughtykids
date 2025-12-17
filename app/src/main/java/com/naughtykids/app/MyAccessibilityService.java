@@ -9,8 +9,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 public class MyAccessibilityService extends AccessibilityService {
     private static final String TAG = "MyAccessibilityService";
-
-    private OverlayWIndow mOverlayWIndow;
+    private AppFactory mAppFactory;
 
     @Override
     public void onCreate() {
@@ -48,8 +47,9 @@ public class MyAccessibilityService extends AccessibilityService {
         Log.d(TAG, "Service connected");
         super.onServiceConnected();
 
-        mOverlayWIndow = new OverlayWIndow();
-        mOverlayWIndow.init(this);
+        Utils.setA11y(this);
+        mAppFactory = new AppFactory();
+        OverlayWindowManager.getInstance().init();
     }
 
     @Override
@@ -67,10 +67,18 @@ public class MyAccessibilityService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         Log.v(TAG, "收到辅助功能事件:" + event);
-        if (mOverlayWIndow.isShowing()) {
+        if (OverlayWindowManager.getInstance().isShowing()) {
             Log.v(TAG, "OverlayWIndow is showing");
             return;
         }
+
+        if (event.getEventType() == AccessibilityEvent.TYPE_WINDOWS_CHANGED) {
+            if (!ThirdPartyApp.hasApplicationWindow()) {
+                OverlayWindowManager.getInstance().smallHide();
+            }
+            return;
+        }
+
         AccessibilityNodeInfo rootNodeInfo = this.getRootInActiveWindow();
         if (rootNodeInfo == null) {
             Log.v(TAG, "onAccessibilityEvent rootNodeInfo == null");
@@ -78,25 +86,20 @@ public class MyAccessibilityService extends AccessibilityService {
         }
         CharSequence packageName = event.getPackageName();
         if (packageName == null) {
-            packageName = rootNodeInfo.getPackageName();
-        }
-        if (packageName.equals("com.naughtykids.app")) {
-            Log.v(TAG, "onAccessibilityEvent packageName:" + packageName);
+            Log.v(TAG, "onAccessibilityEvent packageName == null");
             return;
         }
-        if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
-            Log.v(TAG, "onAccessibilityEvent is not TYPE_WINDOW_CONTENT_CHANGED");
+        if (packageName.equals(Utils.getSelfAppPackageName())) {
+            Log.v(TAG, "self event");
             return;
         }
-        if (packageName.equals("com.ss.android.ugc.aweme")) {
-            if (Douyin.onAccessibilityEvent(rootNodeInfo)) {
-                mOverlayWIndow.show();
-            }
-        } else if (packageName.equals("com.tencent.mm")) {
-            if (Wechat.onAccessibilityEvent(rootNodeInfo)) {
-                mOverlayWIndow.show();
-            }
+
+        ThirdPartyApp thirdPartyApp = mAppFactory.getApp(packageName);
+        if (thirdPartyApp != null) {
+            thirdPartyApp.onAccessibilityEvent(rootNodeInfo, event);
         }
+
+        rootNodeInfo.recycle();
     }
 
     @Override
