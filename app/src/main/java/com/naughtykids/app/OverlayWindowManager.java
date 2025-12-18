@@ -21,7 +21,7 @@ public class OverlayWindowManager {
     private WindowManager mWindowManager;
     private View mFullScreenView;
     private WindowManager.LayoutParams mFullScreenParams;
-    private List<View> mSmallViews = new ArrayList<>();
+    private final List<View> mSmallViews = new ArrayList<>();
     private boolean mFullScreenViewShowing = false;
 
     private static class Holder {
@@ -81,15 +81,17 @@ public class OverlayWindowManager {
 
     void smallShow(int x, int y, int w, int h) {
         Log.i(TAG, "smallShow x:" + x + " y:" + y + " w:" + w + " h:" + h);
-        WindowManager.LayoutParams params = createLayoutParams();
-        params.x = x;
-        params.y = y;
-        params.width = w;
-        params.height = h;
-        View view = createView();
-        view.setBackgroundColor(Color.BLUE);
-        mWindowManager.addView(view, params);
-        mSmallViews.add(view);
+        if (x >= 0 && y >= 0 && w >= 0 && h >= 0) {
+            WindowManager.LayoutParams params = createLayoutParams();
+            params.x = x;
+            params.y = y;
+            params.width = w;
+            params.height = h;
+            View view = createView();
+            view.setBackgroundColor(Color.BLUE);
+            mWindowManager.addView(view, params);
+            mSmallViews.add(view);
+        }
     }
 
     void smallHide() {

@@ -2,10 +2,13 @@ package com.naughtykids.app;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.util.Log;
 
 public class Utils {
+    private static final String TAG = "Utils";
     private static AccessibilityService mA11y;
 
     private static String mDesktopAppPackageName;
@@ -35,5 +38,17 @@ public class Utils {
 
     static String getSelfAppPackageName() {
         return mSelfAppPackageName;
+    }
+
+    static String getAppVersion(String app) {
+        try {
+            PackageManager pm = mA11y.getPackageManager();
+            PackageInfo packageInfo = pm.getPackageInfo(app, 0);
+            Log.d(TAG, "App:" + app + " VersionName:" + packageInfo.versionName);
+            return packageInfo.versionName; // 如 "26.8.0"
+        } catch (Exception e) {
+            Log.e(TAG, "Package not found", e);
+        }
+        return null;
     }
 }
