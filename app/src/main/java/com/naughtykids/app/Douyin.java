@@ -96,7 +96,7 @@ class Douyin extends ThirdPartyApp {
                         Log.d(TAG, "onWindowStateChanged nodeInfo:" + nodeInfo);
                         Rect rect = new Rect();
                         nodeInfo.getBoundsInScreen(rect);
-                        OverlayWindowManager.getInstance().smallShow(rect);
+                        OverlayWindowManager.getInstance().smallShow(nodeInfo.getViewIdResourceName(), rect);
                     }
                 }
                 OverlayWindowManager.getInstance().hide();
@@ -263,7 +263,7 @@ class Douyin extends ThirdPartyApp {
                 Log.d(TAG, "onWindowStateChanged nodeInfo:" + nodeInfo);
                 Rect rect = new Rect();
                 nodeInfo.getBoundsInScreen(rect);
-                OverlayWindowManager.getInstance().smallShow(rect);
+                OverlayWindowManager.getInstance().smallShow(key, rect);
                 result = true;
             }
         }

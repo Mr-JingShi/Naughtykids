@@ -15,14 +15,15 @@ import android.view.WindowManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class OverlayWindowManager {
     private static String TAG = "OverlayWindowManager";
     private WindowManager mWindowManager;
     private View mFullScreenView;
     private WindowManager.LayoutParams mFullScreenParams;
-    private final List<View> mSmallUsingViews = new ArrayList<>();
     private final List<View> mSmallIdleViews = new ArrayList<>();
+    private final Map<String, View> mSmallUsingViews = new java.util.HashMap<>();
     private WindowManager.LayoutParams mSmallParams;
     private boolean mFullScreenViewShowing = false;
 
@@ -78,36 +79,50 @@ public class OverlayWindowManager {
         }
     }
 
-    void smallShow(Rect rect) {
-        smallShow(rect.left, rect.top, rect.width(), rect.height());
+    void smallShow(String key, Rect rect) {
+        smallShow(key, rect.left, rect.top, rect.width(), rect.height());
     }
 
-    void smallShow(int x, int y, int w, int h) {
+    void smallShow(String key, int x, int y, int w, int h) {
         if (x >= 0 && y >= 0 && w >= 0 && h >= 0) {
-            for (View view : mSmallUsingViews) {
-                if (view.getX() == x
-                    && view.getY() == y
-                    && view.getWidth() == w
-                    && view.getHeight() == h) {
-                    return;
-                }
+            View view = mSmallUsingViews.get(key);
+            if (view != null
+                && view.getX() == x
+                && view.getY() == y
+                && view.getWidth() == w
+                && view.getHeight() == h) {
+                return;
             }
             Log.i(TAG, "smallShow x:" + x + " y:" + y + " w:" + w + " h:" + h);
             mSmallParams.x = x;
             mSmallParams.y = y;
             mSmallParams.width = w;
             mSmallParams.height = h;
-            View view = createView();
-            mWindowManager.addView(view, mSmallParams);
-            mSmallUsingViews.add(view);
+            if (view != null) {
+                mWindowManager.updateViewLayout(view, mSmallParams);
+            } else {
+                view = createView();
+                mWindowManager.addView(view, mSmallParams);
+            }
+            mSmallUsingViews.put(key, view);
+        }
+    }
+
+    void smallHide(String key) {
+        View view = mSmallUsingViews.get(key);
+        if (view != null) {
+            mWindowManager.removeView(view);
+            mSmallIdleViews.add(view);
+            mSmallUsingViews.remove(key);
         }
     }
 
     void smallHide() {
-        for (int i = mSmallUsingViews.size() - 1; i >= 0; --i) {
-            mWindowManager.removeView(mSmallUsingViews.get(i));
-            mSmallIdleViews.add(mSmallUsingViews.remove(i));
+        for (View view : mSmallUsingViews.values()) {
+            mWindowManager.removeView(view);
         }
+        mSmallIdleViews.addAll(mSmallUsingViews.values());
+        mSmallUsingViews.clear();
     }
 
     private View createView() {

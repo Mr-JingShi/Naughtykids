@@ -11,6 +11,7 @@ abstract class ThirdPartyApp {
     public static final String TAG = "ThirdPartyApp";
     public static final String AndroidAppDialog = "android.app.Dialog";
     public static final String AndroidWidgetImageView = "android.widget.ImageView";
+    public static final String AndroidWidgetFrameLayout = "android.widget.FrameLayout";
 
     abstract void onAccessibilityEvent(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event);
 

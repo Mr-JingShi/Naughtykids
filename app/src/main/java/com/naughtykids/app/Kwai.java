@@ -58,9 +58,19 @@ class Kwai extends ThirdPartyApp {
                             Log.v(TAG, "找到 gift:" + gift + " " + nodeInfo);
                             Rect rect = new Rect();
                             nodeInfo.getBoundsInScreen(rect);
-                            OverlayWindowManager.getInstance().smallShow(rect);
+                            OverlayWindowManager.getInstance().smallShow(gift, rect);
                         }
                     }
+                }
+            }
+        } else if (className.equals(AndroidWidgetFrameLayout)) {
+            List<CharSequence> texts = event.getText();
+            for (CharSequence text : texts) {
+                Log.d(TAG, "onWindowStateChanged text:" + text);
+                if (texts.contains("直播")) {
+                    Log.d(TAG, "onWindowStateChanged rootNodeInfo:" + rootNodeInfo);
+                    mInnerLiveSlideActivityTablet = true;
+                    onViewScrolled(rootNodeInfo, event);
                 }
             }
         }
@@ -68,12 +78,10 @@ class Kwai extends ThirdPartyApp {
 
     private void onViewScrolled(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event) {
         if (mInnerLiveSlideActivityTablet) {
-            boolean result = false;
             for (String gift : mLiveGift) {
-                result |= overlayNodebyKey(rootNodeInfo, gift);
-            }
-            if (!result) {
-                OverlayWindowManager.getInstance().smallHide();
+                if (!overlayNodebyKey(rootNodeInfo, gift)) {
+                    OverlayWindowManager.getInstance().smallHide(gift);
+                }
             }
         }
     }
@@ -83,10 +91,9 @@ class Kwai extends ThirdPartyApp {
         List<AccessibilityNodeInfo> nodeInfos = rootNodeInfo.findAccessibilityNodeInfosByViewId(key);
         if (nodeInfos != null) {
             for (AccessibilityNodeInfo nodeInfo : nodeInfos) {
-                Log.d(TAG, "onWindowStateChanged nodeInfo:" + nodeInfo);
                 Rect rect = new Rect();
                 nodeInfo.getBoundsInScreen(rect);
-                OverlayWindowManager.getInstance().smallShow(rect);
+                OverlayWindowManager.getInstance().smallShow(key, rect);
                 result = true;
             }
         }
