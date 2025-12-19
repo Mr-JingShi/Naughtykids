@@ -16,9 +16,6 @@ class Douyin extends ThirdPartyApp {
     private static final String LivePlayActivity = "com.ss.android.ugc.aweme.live.LivePlayActivity";
     private static final String AudiencePortToolbarMoreDialog = "com.bytedance.android.livesdk.chatroom.viewmodule.toolbar.AudiencePortToolbarMoreDialog";
     private static final String LiveStandardSheetDialog = "com.bytedance.android.livesdk.widget.LiveStandardSheetDialog";
-    private static final String AndroidAppDialog = "android.app.Dialog";
-    private static final String AndroidWidgetImageView = "android.widget.ImageView";
-    private static final String AndroidxViewPager = "androidx.viewpager.widget.ViewPager";
     private static final String TalkSomething = "说点什么...";
     private static final String TalkSomethingAndJoin = "说点什么，参与聊话题...";
     private static final String Xiaoxinxin = "小心心";
@@ -276,9 +273,11 @@ class Douyin extends ThirdPartyApp {
     private void onViewScrolled(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event) {
         if (mInnerLivePlayActivity) {
             if (!TextUtils.isEmpty(mResId_XiaoXinXin) && !TextUtils.isEmpty(mResId_Liwu)) {
-                OverlayWindowManager.getInstance().smallHide();
-                overlayNodebyKey(rootNodeInfo, mResId_XiaoXinXin);
-                overlayNodebyKey(rootNodeInfo, mResId_Liwu);
+                boolean result = overlayNodebyKey(rootNodeInfo, mResId_XiaoXinXin);
+                result |= overlayNodebyKey(rootNodeInfo, mResId_Liwu);
+                if (!result) {
+                    OverlayWindowManager.getInstance().smallHide();
+                }
             }
         }
     }

@@ -21,7 +21,9 @@ public class OverlayWindowManager {
     private WindowManager mWindowManager;
     private View mFullScreenView;
     private WindowManager.LayoutParams mFullScreenParams;
-    private final List<View> mSmallViews = new ArrayList<>();
+    private final List<View> mSmallUsingViews = new ArrayList<>();
+    private final List<View> mSmallIdleViews = new ArrayList<>();
+    private WindowManager.LayoutParams mSmallParams;
     private boolean mFullScreenViewShowing = false;
 
     private static class Holder {
@@ -54,6 +56,8 @@ public class OverlayWindowManager {
             AccessibilityService service = Utils.getA11y();
             service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
         });
+
+        mSmallParams = createLayoutParams();
     }
 
     boolean isShowing() {
@@ -75,14 +79,12 @@ public class OverlayWindowManager {
     }
 
     void smallShow(Rect rect) {
-        Log.i(TAG, "smallShow rect:" + rect);
         smallShow(rect.left, rect.top, rect.width(), rect.height());
     }
 
     void smallShow(int x, int y, int w, int h) {
-        Log.i(TAG, "smallShow x:" + x + " y:" + y + " w:" + w + " h:" + h);
         if (x >= 0 && y >= 0 && w >= 0 && h >= 0) {
-            for (View view : mSmallViews) {
+            for (View view : mSmallUsingViews) {
                 if (view.getX() == x
                     && view.getY() == y
                     && view.getWidth() == w
@@ -90,30 +92,36 @@ public class OverlayWindowManager {
                     return;
                 }
             }
-            WindowManager.LayoutParams params = createLayoutParams();
-            params.x = x;
-            params.y = y;
-            params.width = w;
-            params.height = h;
+            Log.i(TAG, "smallShow x:" + x + " y:" + y + " w:" + w + " h:" + h);
+            mSmallParams.x = x;
+            mSmallParams.y = y;
+            mSmallParams.width = w;
+            mSmallParams.height = h;
             View view = createView();
-            view.setBackgroundColor(Color.BLUE);
-            mWindowManager.addView(view, params);
-            mSmallViews.add(view);
+            mWindowManager.addView(view, mSmallParams);
+            mSmallUsingViews.add(view);
         }
     }
 
     void smallHide() {
-        for (int i = mSmallViews.size() - 1; i >= 0; --i) {
-            mWindowManager.removeView(mSmallViews.get(i));
-            mSmallViews.remove(i);
+        for (int i = mSmallUsingViews.size() - 1; i >= 0; --i) {
+            mWindowManager.removeView(mSmallUsingViews.get(i));
+            mSmallIdleViews.add(mSmallUsingViews.remove(i));
         }
     }
 
     private View createView() {
-        return new View(Utils.getA11y());
+        View view = null;
+        if (mSmallIdleViews.isEmpty()) {
+            view = new View(Utils.getA11y());
+            view.setBackgroundColor(Color.BLUE);
+        } else {
+            view = mSmallIdleViews.remove(0);
+        }
+        return view;
     }
 
-    private WindowManager.LayoutParams createLayoutParams() {
+    private static WindowManager.LayoutParams createLayoutParams() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         params.type = Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP
                 ? WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
