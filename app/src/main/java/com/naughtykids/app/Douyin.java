@@ -1,14 +1,13 @@
 package com.naughtykids.app;
 
 import android.graphics.Rect;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class Douyin extends ThirdPartyApp {
     private static final String TAG = "Douyin";
@@ -18,22 +17,25 @@ class Douyin extends ThirdPartyApp {
     private static final String AudiencePortToolbarMoreDialog = "com.bytedance.android.livesdk.chatroom.viewmodule.toolbar.AudiencePortToolbarMoreDialog";
     private static final String LiveStandardSheetDialog = "com.bytedance.android.livesdk.widget.LiveStandardSheetDialog";
     private static final String AndroidAppDialog = "android.app.Dialog";
+    private static final String AndroidWidgetImageView = "android.widget.ImageView";
+    private static final String AndroidxViewPager = "androidx.viewpager.widget.ViewPager";
     private static final String TalkSomething = "说点什么...";
     private static final String TalkSomethingAndJoin = "说点什么，参与聊话题...";
     private static final String Xiaoxinxin = "小心心";
     private static final String Liwu = "礼物";
     private final List<String> mLiveGift = new ArrayList<>();
     private final List<String> mChecksText = new ArrayList<>();
-    private Rect mXiaoXinXinRect;
-    private Rect mLiwuRect;
+    private String mResId_XiaoXinXin;
+    private String mResId_Liwu;
+    private boolean mInnerLivePlayActivity = false;
 
     Douyin() {
         String versionName = Utils.getAppVersion(PackageName);
         Log.d(TAG, "versionName:" + versionName);
         String versionNameInPreferences = PrivatePreferences.getDouyinVersion();
         if (versionNameInPreferences.equals(versionName)) {
-            mXiaoXinXinRect = PrivatePreferences.getDouyinLiveGift_Xiaoxinxin();
-            mLiwuRect = PrivatePreferences.getDouyinLiveGift_Liwu();
+            mResId_XiaoXinXin = PrivatePreferences.getDouyinLiveGift_Xiaoxinxin();
+            mResId_Liwu = PrivatePreferences.getDouyinLiveGift_Liwu();
         } else {
             PrivatePreferences.setDouyinVersion(versionName);
         }
@@ -59,6 +61,8 @@ class Douyin extends ThirdPartyApp {
             case AccessibilityEvent.TYPE_VIEW_CLICKED:
                 onViewClicked(rootNodeInfo, event);
                 break;
+            case AccessibilityEvent.TYPE_VIEW_SCROLLED:
+                onViewScrolled(rootNodeInfo, event);
             default:
                 break;
         }
@@ -83,27 +87,19 @@ class Douyin extends ThirdPartyApp {
         if (className.equals(LiveStandardSheetDialog)) {
             OverlayWindowManager.getInstance().show();
         } else if (className.equals(LivePlayActivity)) {
-            if (mXiaoXinXinRect != null &&  mLiwuRect != null) {
-                OverlayWindowManager.getInstance().smallShow(mXiaoXinXinRect);
-                OverlayWindowManager.getInstance().smallShow(mLiwuRect);
+            mInnerLivePlayActivity = true;
+            if (!TextUtils.isEmpty(mResId_XiaoXinXin) && !TextUtils.isEmpty(mResId_Liwu)) {
+                overlayNodebyKey(rootNodeInfo, mResId_XiaoXinXin);
+                overlayNodebyKey(rootNodeInfo, mResId_Liwu);
             } else {
                 OverlayWindowManager.getInstance().show();
                 List<AccessibilityNodeInfo> nodeInfos = new ArrayList<>();
                 if (findNodeByContentDescription(rootNodeInfo, mLiveGift, nodeInfos)) {
                     for (AccessibilityNodeInfo nodeInfo : nodeInfos) {
                         Log.d(TAG, "onWindowStateChanged nodeInfo:" + nodeInfo);
-                        if (nodeInfo.isVisibleToUser()/* && nodeInfo.isClickable()*/) {
-                            Rect rect = new Rect();
-                            nodeInfo.getBoundsInScreen(rect);
-                            OverlayWindowManager.getInstance().smallShow(rect);
-                            if (nodeInfo.getContentDescription().equals(Xiaoxinxin)) {
-                                mXiaoXinXinRect = rect;
-                                PrivatePreferences.setDouyinLiveGift_Xiaoxinxin(rect);
-                            } else if (nodeInfo.getContentDescription().equals(Liwu)) {
-                                mLiwuRect = rect;
-                                PrivatePreferences.setDouyinLiveGift_Liwu(rect);
-                            }
-                        }
+                        Rect rect = new Rect();
+                        nodeInfo.getBoundsInScreen(rect);
+                        OverlayWindowManager.getInstance().smallShow(rect);
                     }
                 }
                 OverlayWindowManager.getInstance().hide();
@@ -191,17 +187,34 @@ class Douyin extends ThirdPartyApp {
         return !nodeInfos.isEmpty();
     }
 
-    static boolean findNodeByContentDescription(AccessibilityNodeInfo rootNode, List<String> descriptions, List<AccessibilityNodeInfo> nodeInfos) {
+    boolean findNodeByContentDescription(AccessibilityNodeInfo rootNode, List<String> descriptions, List<AccessibilityNodeInfo> nodeInfos) {
         if (rootNode == null) return false;
 
+        boolean descriptionEquals = false;
         CharSequence contentDescription = rootNode.getContentDescription();
         if (contentDescription != null && contentDescription.length() > 0) {
             for (String description : descriptions) {
                 if (contentDescription.equals(description)) {
-                    nodeInfos.add(rootNode);
-                    if (nodeInfos.size() == descriptions.size()) {
-                        return true;
+                    String viewIdResourceName = rootNode.getViewIdResourceName();
+                    CharSequence className = rootNode.getClassName();
+                    if (viewIdResourceName != null
+                        && !viewIdResourceName.isEmpty()
+                        && className != null
+                        && className.equals(AndroidWidgetImageView)) {
+                        nodeInfos.add(rootNode);
+                        if (contentDescription.equals(Xiaoxinxin)) {
+                            mResId_XiaoXinXin = viewIdResourceName;
+                            PrivatePreferences.setDouyinLiveGift_Xiaoxinxin(viewIdResourceName);
+                        } else if (contentDescription.equals(Liwu)) {
+                            mResId_Liwu = viewIdResourceName;
+                            PrivatePreferences.setDouyinLiveGift_Liwu(viewIdResourceName);
+                        }
+                        if (nodeInfos.size() == descriptions.size()) {
+                            return true;
+                        }
                     }
+
+                    descriptionEquals = true;
                     break;
                 }
             }
@@ -209,10 +222,64 @@ class Douyin extends ThirdPartyApp {
 
         int childCount = rootNode.getChildCount();
         for (int i = 0; i < childCount; i++) {
-            if (findNodeByContentDescription(rootNode.getChild(i), descriptions, nodeInfos)) {
+            AccessibilityNodeInfo sonNode = rootNode.getChild(i);
+            if (descriptionEquals) {
+                String viewIdResourceName = sonNode.getViewIdResourceName();
+                CharSequence className = sonNode.getClassName();
+                if (viewIdResourceName != null
+                    && !viewIdResourceName.isEmpty()
+                    && className != null
+                    && className.equals(AndroidWidgetImageView)) {
+                    Rect rootRect = new Rect();
+                    rootNode.getBoundsInScreen(rootRect);
+                    Rect sonRect = new Rect();
+                    sonNode.getBoundsInScreen(sonRect);
+                    if (rootRect.equals(sonRect)) {
+                        nodeInfos.add(sonNode);
+
+                        if (contentDescription.equals(Xiaoxinxin)) {
+                            mResId_XiaoXinXin = viewIdResourceName;
+                            PrivatePreferences.setDouyinLiveGift_Xiaoxinxin(viewIdResourceName);
+                        } else if (contentDescription.equals(Liwu)) {
+                            mResId_Liwu = viewIdResourceName;
+                            PrivatePreferences.setDouyinLiveGift_Liwu(viewIdResourceName);
+                        }
+
+                        if (nodeInfos.size() == descriptions.size()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            if (findNodeByContentDescription(sonNode, descriptions, nodeInfos)) {
                 return true;
             }
         }
         return false;
+    }
+
+    static boolean overlayNodebyKey(AccessibilityNodeInfo rootNodeInfo, String key) {
+        boolean result = false;
+        List<AccessibilityNodeInfo> nodeInfos = rootNodeInfo.findAccessibilityNodeInfosByViewId(key);
+        if (nodeInfos != null) {
+            for (AccessibilityNodeInfo nodeInfo : nodeInfos) {
+                Log.d(TAG, "onWindowStateChanged nodeInfo:" + nodeInfo);
+                Rect rect = new Rect();
+                nodeInfo.getBoundsInScreen(rect);
+                OverlayWindowManager.getInstance().smallShow(rect);
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    private void onViewScrolled(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event) {
+        if (mInnerLivePlayActivity) {
+            if (!TextUtils.isEmpty(mResId_XiaoXinXin) && !TextUtils.isEmpty(mResId_Liwu)) {
+                OverlayWindowManager.getInstance().smallHide();
+                overlayNodebyKey(rootNodeInfo, mResId_XiaoXinXin);
+                overlayNodebyKey(rootNodeInfo, mResId_Liwu);
+            }
+        }
     }
 }

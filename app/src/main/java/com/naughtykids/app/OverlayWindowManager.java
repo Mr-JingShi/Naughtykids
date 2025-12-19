@@ -82,6 +82,14 @@ public class OverlayWindowManager {
     void smallShow(int x, int y, int w, int h) {
         Log.i(TAG, "smallShow x:" + x + " y:" + y + " w:" + w + " h:" + h);
         if (x >= 0 && y >= 0 && w >= 0 && h >= 0) {
+            for (View view : mSmallViews) {
+                if (view.getX() == x
+                    && view.getY() == y
+                    && view.getWidth() == w
+                    && view.getHeight() == h) {
+                    return;
+                }
+            }
             WindowManager.LayoutParams params = createLayoutParams();
             params.x = x;
             params.y = y;

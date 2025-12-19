@@ -16,17 +16,17 @@ public class PrivatePreferences {
         putString(DouyinVersion, value);
     }
 
-    public static void setDouyinLiveGift_Xiaoxinxin(Rect rect) {
-        saveRect(DouyinLiveGift_Xiaoxinxin, rect);
+    public static void setDouyinLiveGift_Xiaoxinxin(String resId) {
+        putString(DouyinLiveGift_Xiaoxinxin, resId);
     }
-    public static Rect getDouyinLiveGift_Xiaoxinxin() {
-        return loadRect(DouyinLiveGift_Xiaoxinxin);
+    public static String getDouyinLiveGift_Xiaoxinxin() {
+        return getString(DouyinLiveGift_Xiaoxinxin, "");
     }
-    public static void setDouyinLiveGift_Liwu(Rect rect) {
-        saveRect(DouyinLiveGift_Liwu, rect);
+    public static void setDouyinLiveGift_Liwu(String resId) {
+        putString(DouyinLiveGift_Liwu, resId);
     }
-    public static Rect getDouyinLiveGift_Liwu() {
-        return loadRect(DouyinLiveGift_Liwu);
+    public static String getDouyinLiveGift_Liwu() {
+        return getString(DouyinLiveGift_Liwu, "");
     }
 
     private static void saveRect(String key, Rect rect) {

@@ -66,7 +66,9 @@ public class MyAccessibilityService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        Log.v(TAG, "收到辅助功能事件:" + event);
+        if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
+            Log.v(TAG, "收到辅助功能事件:" + event);
+        }
         if (OverlayWindowManager.getInstance().isShowing()) {
             Log.v(TAG, "OverlayWIndow is showing");
             return;
