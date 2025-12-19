@@ -17,6 +17,8 @@ final class AppFactory {
                 thirdPartyApp = new Douyin();
             } else if (packageName.equals(Wechat.PackageName)) {
                 thirdPartyApp = new Wechat();
+            } else if (packageName.equals(Kwai.PackageName)) {
+                thirdPartyApp = new Kwai();
             }
 
             if (thirdPartyApp != null) {
