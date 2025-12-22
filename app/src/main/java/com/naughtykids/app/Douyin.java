@@ -11,6 +11,7 @@ import java.util.List;
 
 class Douyin extends ThirdPartyApp {
     private static final String TAG = "Douyin";
+    public static final String AppName = "抖音";
     public static final String PackageName = "com.ss.android.ugc.aweme";
     private static final String MainActivity = "com.ss.android.ugc.aweme.main.MainActivity";
     private static final String LivePlayActivity = "com.ss.android.ugc.aweme.live.LivePlayActivity";
@@ -20,6 +21,8 @@ class Douyin extends ThirdPartyApp {
     private static final String TalkSomethingAndJoin = "说点什么，参与聊话题...";
     private static final String Xiaoxinxin = "小心心";
     private static final String Liwu = "礼物";
+    private static final String DouyinLiveGift_Xiaoxinxin = "DouyinLiveGift_Xiaoxinxin";
+    private static final String DouyinLiveGift_Liwu = "DouyinLiveGift_Liwu";
     private final List<String> mLiveGift = new ArrayList<>();
     private final List<String> mChecksText = new ArrayList<>();
     private String mResId_XiaoXinXin;
@@ -27,15 +30,7 @@ class Douyin extends ThirdPartyApp {
     private boolean mInnerLivePlayActivity = false;
 
     Douyin() {
-        String versionName = Utils.getAppVersion(PackageName);
-        Log.d(TAG, "versionName:" + versionName);
-        String versionNameInPreferences = PrivatePreferences.getDouyinVersion();
-        if (versionNameInPreferences.equals(versionName)) {
-            mResId_XiaoXinXin = PrivatePreferences.getDouyinLiveGift_Xiaoxinxin();
-            mResId_Liwu = PrivatePreferences.getDouyinLiveGift_Liwu();
-        } else {
-            PrivatePreferences.setDouyinVersion(versionName);
-        }
+        checkVersion();
 
         mLiveGift.add(Xiaoxinxin);
         mLiveGift.add(Liwu);
@@ -44,6 +39,24 @@ class Douyin extends ThirdPartyApp {
         mChecksText.add("立即支付");
         mChecksText.add("提交订单"); // 团购->商品详情
         mChecksText.add("输入支付密码"); // 输入秘密
+    }
+
+    @Override
+    public boolean checkVersion() {
+        boolean ret = super.checkVersion();
+        if (ret) {
+            mResId_XiaoXinXin = PrivatePreferences.getString(DouyinLiveGift_Xiaoxinxin, "");
+            mResId_Liwu = PrivatePreferences.getString(DouyinLiveGift_Liwu, "");
+        } else {
+            mResId_XiaoXinXin = null;
+            mResId_Liwu = null;
+        }
+        return ret;
+    }
+
+    @Override
+    public String getPackageName() {
+        return PackageName;
     }
 
     @Override
@@ -102,6 +115,7 @@ class Douyin extends ThirdPartyApp {
                 OverlayWindowManager.getInstance().hide();
             }
         } else if (className.equals(MainActivity)) {
+            mInnerLivePlayActivity = false;
             OverlayWindowManager.getInstance().smallHide();
         } else if (className.equals(AudiencePortToolbarMoreDialog)) {
             OverlayWindowManager.getInstance().smallHide();
@@ -201,10 +215,10 @@ class Douyin extends ThirdPartyApp {
                         nodeInfos.add(rootNode);
                         if (contentDescription.equals(Xiaoxinxin)) {
                             mResId_XiaoXinXin = viewIdResourceName;
-                            PrivatePreferences.setDouyinLiveGift_Xiaoxinxin(viewIdResourceName);
+                            PrivatePreferences.putString(DouyinLiveGift_Xiaoxinxin, viewIdResourceName);
                         } else if (contentDescription.equals(Liwu)) {
                             mResId_Liwu = viewIdResourceName;
-                            PrivatePreferences.setDouyinLiveGift_Liwu(viewIdResourceName);
+                            PrivatePreferences.putString(DouyinLiveGift_Liwu, viewIdResourceName);
                         }
                         if (nodeInfos.size() == descriptions.size()) {
                             return true;
@@ -236,10 +250,10 @@ class Douyin extends ThirdPartyApp {
 
                         if (contentDescription.equals(Xiaoxinxin)) {
                             mResId_XiaoXinXin = viewIdResourceName;
-                            PrivatePreferences.setDouyinLiveGift_Xiaoxinxin(viewIdResourceName);
+                            PrivatePreferences.putString(DouyinLiveGift_Xiaoxinxin, viewIdResourceName);
                         } else if (contentDescription.equals(Liwu)) {
                             mResId_Liwu = viewIdResourceName;
-                            PrivatePreferences.setDouyinLiveGift_Liwu(viewIdResourceName);
+                            PrivatePreferences.putString(DouyinLiveGift_Liwu, viewIdResourceName);
                         }
 
                         if (nodeInfos.size() == descriptions.size()) {

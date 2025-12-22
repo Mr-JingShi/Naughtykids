@@ -23,9 +23,11 @@ public class Utils {
 
         if (resolveInfo != null && resolveInfo.activityInfo != null) {
             mDesktopAppPackageName = resolveInfo.activityInfo.packageName;
+            Log.d(TAG, "DesktopAppPackageName:" + mDesktopAppPackageName);
         }
 
         mSelfAppPackageName = a11y.getPackageName();
+        Log.d(TAG, "SelfAppPackageName:" + mSelfAppPackageName);
     }
 
     static AccessibilityService getA11y() {

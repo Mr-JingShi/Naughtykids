@@ -13,6 +13,13 @@ class Wechat extends ThirdPartyApp {
             "塞钱进红包",
             "转账金额"
     };
+
+    @Override
+    public String getPackageName() {
+        return PackageName;
+    }
+
+    @Override
     public void onAccessibilityEvent(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event) {
         if (rootNodeInfo != null && rootNodeInfo.isVisibleToUser()) {
             for (String keyWord : KEY_WORDS) {

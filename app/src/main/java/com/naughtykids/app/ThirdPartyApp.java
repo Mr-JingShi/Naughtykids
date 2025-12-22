@@ -8,12 +8,27 @@ import android.view.accessibility.AccessibilityWindowInfo;
 import java.util.List;
 
 abstract class ThirdPartyApp {
-    public static final String TAG = "ThirdPartyApp";
-    public static final String AndroidAppDialog = "android.app.Dialog";
-    public static final String AndroidWidgetImageView = "android.widget.ImageView";
-    public static final String AndroidWidgetFrameLayout = "android.widget.FrameLayout";
+    static final String TAG = "ThirdPartyApp";
+    static final String AndroidAppDialog = "android.app.Dialog";
+    static final String AndroidWidgetImageView = "android.widget.ImageView";
+    static final String AndroidWidgetTextView = "android.widget.TextView";
+    static final String AndroidWidgetFrameLayout = "android.widget.FrameLayout";
 
+    abstract String getPackageName();
     abstract void onAccessibilityEvent(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event);
+    boolean checkVersion() {
+        boolean ret = false;
+        String packageName = getPackageName();
+        String versionName = Utils.getAppVersion(packageName);
+        String versionNameInPreferences = PrivatePreferences.getString(packageName, "");
+        Log.d(TAG, "versionName:" + versionName + " versionNameInPreferences:" + versionNameInPreferences);
+        if (versionNameInPreferences.equals(versionName)) {
+            ret = true;
+        } else {
+            PrivatePreferences.putString(packageName, versionName);
+        }
+        return ret;
+    }
 
     static void traverseAllNodes(AccessibilityNodeInfo node) {
         if (node == null) return;

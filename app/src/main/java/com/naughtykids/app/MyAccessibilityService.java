@@ -3,13 +3,13 @@ package com.naughtykids.app;
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;
 import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 public class MyAccessibilityService extends AccessibilityService {
     private static final String TAG = "MyAccessibilityService";
-    private AppFactory mAppFactory;
 
     @Override
     public void onCreate() {
@@ -48,7 +48,6 @@ public class MyAccessibilityService extends AccessibilityService {
         super.onServiceConnected();
 
         Utils.setA11y(this);
-        mAppFactory = new AppFactory();
         OverlayWindowManager.getInstance().init();
     }
 
@@ -96,7 +95,7 @@ public class MyAccessibilityService extends AccessibilityService {
             return;
         }
 
-        ThirdPartyApp thirdPartyApp = mAppFactory.getApp(packageName);
+        ThirdPartyApp thirdPartyApp = AppFactory.getInstance().getApp(packageName);
         if (thirdPartyApp != null) {
             thirdPartyApp.onAccessibilityEvent(rootNodeInfo, event);
         }
