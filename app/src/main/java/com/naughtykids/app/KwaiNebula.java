@@ -10,11 +10,6 @@ class KwaiNebula extends Kwai {
     }
 
     @Override
-    public String getLiveActivity() {
-        return "com.yxcorp.gifshow.detail.PhotoDetailActivityTablet";
-    }
-
-    @Override
     public String getResIdPrefix() {
         return "com.kuaishou.nebula.live_audience_plugin";
     }

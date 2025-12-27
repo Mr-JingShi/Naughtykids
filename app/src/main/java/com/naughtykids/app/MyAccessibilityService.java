@@ -2,8 +2,8 @@ package com.naughtykids.app;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
-import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -46,6 +46,13 @@ public class MyAccessibilityService extends AccessibilityService {
     protected void onServiceConnected() {
         Log.d(TAG, "Service connected");
         super.onServiceConnected();
+
+        Intent fgIntent = new Intent(this, KeepAliveService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(fgIntent);
+        } else {
+            startService(fgIntent);
+        }
 
         Utils.setA11y(this);
         OverlayWindowManager.getInstance().init();

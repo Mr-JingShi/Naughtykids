@@ -30,19 +30,6 @@ abstract class ThirdPartyApp {
         return ret;
     }
 
-    static void traverseAllNodes(AccessibilityNodeInfo node) {
-        if (node == null) return;
-        Log.d(TAG, "traverseAllNodes node:" + node);
-
-        // 遍历所有子节点
-        int childCount = node.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            AccessibilityNodeInfo child = node.getChild(i);
-            traverseAllNodes(child); // 递归
-            child.recycle(); // 回收
-        }
-    }
-
     static boolean hasApplicationWindow() {
         List<AccessibilityWindowInfo> windowInfos = Utils.getA11y().getWindows();
         for (int i = 0; i < windowInfos.size(); i++) {

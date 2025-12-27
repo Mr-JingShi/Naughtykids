@@ -13,12 +13,30 @@ class Kwai extends ThirdPartyApp {
     public static final String AppName = "快手";
     public static final String PackageName = "com.smile.gifmaker";
     private final List<String> mLiveGift = new ArrayList<>();
+    private final List<String> mLiveActivities = new ArrayList<>();
     private boolean mInnerLiveActivity = false;
-
     Kwai() {
+        checkVersion();
+
+        mLiveGift.add(getResIdPrefix() + ":id/live_quick_handle_kds_bar_outline_container"); // 直播-冲冲喜欢你
+        mLiveGift.add(getResIdPrefix() + ":id/live_right_bottom_pendant_container"); // 直播-双旦活动
         mLiveGift.add(getResIdPrefix() + ":id/live_bottom_bar_guide_gift_view");
-        mLiveGift.add(getResIdPrefix() + ":id/live_gift");
+        mLiveGift.add(getResIdPrefix() + ":id/live_gift"); // 直播-礼物
+        mLiveGift.add(getResIdPrefix() + ":id/live_gift_battle_bottom_bar_view"); // 直播-打比赛-送出小可爱
         mLiveGift.add(getResIdPrefix() + ":id/live_audience_bottom_bar_fans_group_entrance_icon");
+
+        mLiveActivities.add("com.kuaishou.live.core.basic.activity.LiveSlideActivity");
+        mLiveActivities.add("com.kuaishou.live.core.basic.activity.LiveSlideActivityTablet");
+        mLiveActivities.add("com.yxcorp.gifshow.detail.PhotoDetailActivity");
+        mLiveActivities.add("com.yxcorp.gifshow.detail.PhotoDetailActivityTablet");
+    }
+
+    @Override
+    public boolean checkVersion() {
+        String packageName = getPackageName();
+        String versionName = Utils.getAppVersion(packageName);
+        Log.d(TAG, "versionName:" + versionName);
+        return true;
     }
 
     @Override
@@ -26,8 +44,8 @@ class Kwai extends ThirdPartyApp {
         return PackageName;
     }
 
-    public String getLiveActivity() {
-        return "com.kuaishou.live.core.basic.activity.LiveSlideActivityTablet";
+    public List<String> getLiveActivity() {
+        return mLiveActivities;
     }
 
     public String getHomeActivity() {
@@ -67,7 +85,7 @@ class Kwai extends ThirdPartyApp {
         if (className.equals(getHomeActivity())) {
             mInnerLiveActivity = false;
             OverlayWindowManager.getInstance().smallHide();
-        } else if (className.equals(getLiveActivity())) {
+        } else if (getLiveActivity().contains(className.toString())) {
             mInnerLiveActivity = true;
             for (String gift : mLiveGift) {
                 Log.v(TAG, "gift:" + gift);
@@ -94,6 +112,8 @@ class Kwai extends ThirdPartyApp {
                     onViewScrolled(rootNodeInfo, event);
                 }
             }
+        } else if (className.equals("com.kuaishou.live.core.basic.activity.LiveSlideActivity")) {
+            UiDumper.dumpNodeTree(rootNodeInfo);
         }
     }
 

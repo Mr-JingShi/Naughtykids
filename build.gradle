@@ -14,10 +14,6 @@ allprojects {
         mavenCentral()
         maven { url "https://jitpack.io" }
     }
-
-    tasks.withType(JavaCompile) {
-        // options.compilerArgs << "-Xlint:deprecation"
-    }
 }
 
 task clean(type: Delete) {
@@ -27,7 +23,7 @@ task clean(type: Delete) {
 ext {
     minSdkVersion = 21
     compileSdkVersion = 34
-    targetSdkVersion = 34
+    targetSdkVersion = 33
     buildToolsVersion = "34.0.0"
     javaVersion = JavaVersion.VERSION_1_8
 }

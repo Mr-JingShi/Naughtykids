@@ -93,13 +93,13 @@ public class OverlayWindowManager {
                 && view.getHeight() == h) {
                 return;
             }
-            Log.i(TAG, "smallShow x:" + x + " y:" + y + " w:" + w + " h:" + h);
+            Log.i(TAG, "smallShow id:" + key + " x:" + x + " y:" + y + " w:" + w + " h:" + h);
             mSmallParams.x = x;
             mSmallParams.y = y;
             mSmallParams.width = w;
             mSmallParams.height = h;
             if (view != null) {
-                mWindowManager.updateViewLayout(view, mSmallParams);
+                //mWindowManager.updateViewLayout(view, mSmallParams);
             } else {
                 view = createView();
                 mWindowManager.addView(view, mSmallParams);
