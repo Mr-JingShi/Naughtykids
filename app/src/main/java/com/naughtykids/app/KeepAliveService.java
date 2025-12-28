@@ -7,13 +7,19 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
 public class KeepAliveService extends Service {
+    private static final String TAG = "KeepAliveService";
     @Override
     public void onCreate() {
         super.onCreate();
+
+        CrashHandler.getInstance().init();
+
+        Log.d(TAG, "Service on create");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final String CHANNEL_ID = "A11Y_KEEP_ALIVE";
             final int NOTIFICATION_ID = 1;

@@ -8,7 +8,7 @@ import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-public class MyAccessibilityService extends AccessibilityService {
+public class A11y extends AccessibilityService {
     private static final String TAG = "MyAccessibilityService";
 
     @Override

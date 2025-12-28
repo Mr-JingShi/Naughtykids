@@ -4,9 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
-public class MyApplication extends Application {
-    private static String TAG = "MyApplication";
-    public MyApplication() {
+public class App extends Application {
+    private static String TAG = "App";
+    public App() {
         super();
     }
 

@@ -5,6 +5,7 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,7 +16,6 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
 
-import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
@@ -39,7 +39,17 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
         processNotificationsPermission();
         processFloatWindow();
+        if (hasNotificationPermission()) {
+            processAccessibilityService();
+        } else {
+            processNotificationsPermission();
+        }
         processPowerSavePermission();
+
+        if (!PrivatePreferences.getBoolean(this, "AutoStart", false)) {
+            goToAutoStartSettings(this);
+            PrivatePreferences.putBoolean(this, "AutoStart", true);
+        }
     }
 
     private boolean hasOverlayPermission() {
@@ -98,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             final PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
             if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
                 builder.setTitle("低电量优化策略");
                 builder.setMessage("请允许熊孩子应用忽略低电量优化策略，以确保熊孩子应用能在低电量时正常运行");
                 builder.setNegativeButton("取消", null);
@@ -113,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     }
 
     private void processAccessibilityService()  {
-        if (!isAccessibilityEnabled(MyAccessibilityService.class)) {
+        if (!isAccessibilityEnabled(A11y.class)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("需要无障碍权限才能使用该功能");
             builder.setPositiveButton("确定", (dialog, which) -> {
@@ -136,10 +145,11 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         AccessibilityManager am = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
         List<AccessibilityServiceInfo> enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
         if (enabledServices == null || enabledServices.isEmpty()) {
+            Log.i(TAG, "isAccessibilityEnabled enabledServices is empty");
             return false;
         }
 
-        String targetServiceId = new ComponentName(this, serviceClass).flattenToString();
+        String targetServiceId = new ComponentName(this, serviceClass).flattenToShortString();
         for (AccessibilityServiceInfo service : enabledServices) {
             if (service.getId().equals(targetServiceId)) {
                 return true;
@@ -150,8 +160,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
     public void processNotificationsPermission() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_NOTIFICATION_PERMISSION);
-        } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("需要通知权限才能使用该功能");
             builder.setPositiveButton("确定", (dialog, which) -> {
@@ -164,6 +172,9 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
                 Toast.makeText(this, "请授予通知权限", Toast.LENGTH_LONG).show();
             });
             builder.show();
+        } else {
+            // 首次请求 或 用户勾选了“不再询问”
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_NOTIFICATION_PERMISSION);
         }
     }
 
@@ -183,6 +194,18 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         // https://developer.android.com/develop/ui/views/notifications/notification-permission?hl=zh-cn
         // Android 13（API 级别 33）及更高版本支持用于从应用发送非豁免（包括前台服务 [FGS]）通知的运行时权限：POST_NOTIFICATIONS。此更改有助于用户专注于最重要的通知。
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-                || checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED;
+                || checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public void goToAutoStartSettings(Context context) {
+        try {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", context.getPackageName(), null);
+            intent.setData(uri);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to open app settings", e);
+        }
     }
 }
