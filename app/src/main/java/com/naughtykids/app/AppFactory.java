@@ -33,6 +33,14 @@ final class AppFactory {
                 thirdPartyApp = new Kwai();
             } else if (packageName.equals(KwaiNebula.PackageName)) {
                 thirdPartyApp = new KwaiNebula();
+            } else if (packageName.equals(TaoBao.PackageName)) {
+                thirdPartyApp = new TaoBao();
+            } else if (packageName.equals(JingDong.PackageName)) {
+                thirdPartyApp = new JingDong();
+            } else if (packageName.equals(PingDuoDuo.PackageName)) {
+                thirdPartyApp = new PingDuoDuo();
+            } else if (packageName.equals(Tmall.PackageName)) {
+                thirdPartyApp = new Tmall();
             }
 
             if (thirdPartyApp != null) {
