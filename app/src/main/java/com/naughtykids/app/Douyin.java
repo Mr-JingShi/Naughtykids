@@ -42,16 +42,19 @@ class Douyin extends ThirdPartyApp {
     }
 
     @Override
-    public boolean checkVersion() {
-        boolean ret = super.checkVersion();
-        if (ret) {
+    public void checkVersion() {
+        String packageName = getPackageName();
+        String versionName = Utils.getAppVersion(packageName);
+        String versionNameInPreferences = PrivatePreferences.getString(packageName, "");
+        Log.d(TAG, "versionName:" + versionName + " versionNameInPreferences:" + versionNameInPreferences);
+        if (versionNameInPreferences.equals(versionName)) {
             mResId_XiaoXinXin = PrivatePreferences.getString(DouyinLiveGift_Xiaoxinxin, "");
             mResId_Liwu = PrivatePreferences.getString(DouyinLiveGift_Liwu, "");
         } else {
+            PrivatePreferences.putString(packageName, versionName);
             mResId_XiaoXinXin = null;
             mResId_Liwu = null;
         }
-        return ret;
     }
 
     @Override

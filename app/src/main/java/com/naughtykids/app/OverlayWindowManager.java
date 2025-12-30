@@ -22,10 +22,12 @@ public class OverlayWindowManager {
     private WindowManager mWindowManager;
     private View mFullScreenView;
     private WindowManager.LayoutParams mFullScreenParams;
+    private int mClickBackCount;
     private final List<View> mSmallIdleViews = new ArrayList<>();
     private final Map<String, View> mSmallUsingViews = new java.util.HashMap<>();
     private WindowManager.LayoutParams mSmallParams;
     private boolean mFullScreenViewShowing = false;
+    private final int[] mViewLocation = new int[2];
 
     private static class Holder {
         private static final OverlayWindowManager mInstance = new OverlayWindowManager();
@@ -54,8 +56,10 @@ public class OverlayWindowManager {
 
             hide();
 
-            AccessibilityService service = Utils.getA11y();
-            service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+            for (int i = 0; i < mClickBackCount; i++) {
+                AccessibilityService service = Utils.getA11y();
+                service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+            }
         });
 
         mSmallParams = createLayoutParams();
@@ -68,8 +72,12 @@ public class OverlayWindowManager {
     void show() {
         if (!mFullScreenViewShowing) {
             mFullScreenViewShowing = true;
+            mClickBackCount = 1;
             mWindowManager.addView(mFullScreenView, mFullScreenParams);
         }
+    }
+    void setClickBackCount(int count) {
+        this.mClickBackCount = count;
     }
 
     void hide() {
@@ -86,12 +94,11 @@ public class OverlayWindowManager {
     void smallShow(String key, int x, int y, int w, int h) {
         if (x >= 0 && y >= 0 && w >= 0 && h >= 0) {
             View view = mSmallUsingViews.get(key);
-            if (view != null
-                && view.getX() == x
-                && view.getY() == y
-                && view.getWidth() == w
-                && view.getHeight() == h) {
-                return;
+            if (view != null) {
+                view.getLocationOnScreen(mViewLocation);
+                if (mViewLocation[0] == x && mViewLocation[1] == y && view.getWidth() == w && view.getHeight() == h) {
+                    return;
+                }
             }
             Log.i(TAG, "smallShow id:" + key + " x:" + x + " y:" + y + " w:" + w + " h:" + h);
             mSmallParams.x = x;
@@ -99,7 +106,7 @@ public class OverlayWindowManager {
             mSmallParams.width = w;
             mSmallParams.height = h;
             if (view != null) {
-                //mWindowManager.updateViewLayout(view, mSmallParams);
+                mWindowManager.updateViewLayout(view, mSmallParams);
             } else {
                 view = createView();
                 mWindowManager.addView(view, mSmallParams);
@@ -141,7 +148,7 @@ public class OverlayWindowManager {
         params.type = Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP
                 ? WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
                 : WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
-        params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+        params.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                 | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                 | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL

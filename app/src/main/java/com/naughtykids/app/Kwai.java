@@ -32,11 +32,10 @@ class Kwai extends ThirdPartyApp {
     }
 
     @Override
-    public boolean checkVersion() {
+    public void checkVersion() {
         String packageName = getPackageName();
         String versionName = Utils.getAppVersion(packageName);
         Log.d(TAG, "versionName:" + versionName);
-        return true;
     }
 
     @Override
@@ -93,7 +92,7 @@ class Kwai extends ThirdPartyApp {
                 if (nodeInfos != null) {
                     for (AccessibilityNodeInfo nodeInfo : nodeInfos) {
                         CharSequence nodeClassName = nodeInfo.getClassName();
-                        if (nodeClassName != null && nodeClassName.equals(AndroidWidgetImageView)) {
+                        if (nodeClassName != null) {
                             Log.v(TAG, "找到 gift:" + gift + " " + nodeInfo);
                             Rect rect = new Rect();
                             nodeInfo.getBoundsInScreen(rect);
