@@ -80,6 +80,10 @@ public class OverlayWindowManager {
         this.mClickBackCount = count;
     }
 
+    void clearBackgroundColor() {
+        mFullScreenView.setBackgroundColor(Color.TRANSPARENT);
+    }
+
     void hide() {
         if (mFullScreenViewShowing) {
             mFullScreenViewShowing = false;

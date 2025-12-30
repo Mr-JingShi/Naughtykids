@@ -9,7 +9,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 public class A11y extends AccessibilityService {
-    private static final String TAG = "MyAccessibilityService";
+    private static final String TAG = "A11y";
 
     @Override
     public void onCreate() {

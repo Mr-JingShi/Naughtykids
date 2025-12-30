@@ -16,8 +16,13 @@ class Wechat extends ThirdPartyApp {
     // 礼物，一般情况下，找不到AppBrandPluginUI，而是找到com.tencent.mm.ui.chatting.ChattingUI
     // private static final String AppBrandPluginUI = "com.tencent.mm.plugin.appbrand.ui.AppBrandPluginUI";
     private static final String Transfer = "转账";
+    // 转账
     private static final String RemittanceUI = "com.tencent.mm.plugin.remittance.ui.RemittanceUI";
-    private static final String LiveUI = "com.tencent.mm.plugin.finder.feed.ui.FinderLiveVisitorWithoutAffinityUI";
+    // 直播间
+    private static final String FinderLiveVisitorWithoutAffinityUI = "com.tencent.mm.plugin.finder.feed.ui.FinderLiveVisitorWithoutAffinityUI";
+    private static final String Service = "服务";
+    // 服务-收付款、钱包等页面
+    private static final String MallIndexUIv2 = "com.tencent.mm.plugin.mall.ui.MallIndexUIv2";
     Wechat() {
         checkVersion();
     }
@@ -65,6 +70,8 @@ class Wechat extends ThirdPartyApp {
             } else if (texts.contains(Transfer)) {
                 OverlayWindowManager.getInstance().show();
                 OverlayWindowManager.getInstance().setClickBackCount(2);
+            } else if (texts.contains(Service)) {
+                OverlayWindowManager.getInstance().show();
             }
         }
     }
@@ -80,10 +87,11 @@ class Wechat extends ThirdPartyApp {
         } else if (className.equals(RemittanceUI)) {
             OverlayWindowManager.getInstance().show();
             OverlayWindowManager.getInstance().setClickBackCount(2);
-        } else if (className.equals(LiveUI)) {
-           UiDumper.dumpNodeTree(rootNodeInfo);
-        } else {
-
+        } else if (className.equals(FinderLiveVisitorWithoutAffinityUI)) {
+            OverlayWindowManager.getInstance().clearBackgroundColor();
+            OverlayWindowManager.getInstance().show();
+        } else if (className.equals(MallIndexUIv2)) {
+            OverlayWindowManager.getInstance().show();
         }
     }
     private void onWindowContentChanged(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event) {
