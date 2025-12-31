@@ -41,6 +41,8 @@ final class AppFactory {
                 thirdPartyApp = new PingDuoDuo();
             } else if (packageName.equals(Tmall.PackageName)) {
                 thirdPartyApp = new Tmall();
+            } else if (packageName.equals(Bilibili.PackageName)) {
+                thirdPartyApp = new Bilibili();
             }
 
             if (thirdPartyApp != null) {
