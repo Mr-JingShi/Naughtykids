@@ -43,6 +43,14 @@ final class AppFactory {
                 thirdPartyApp = new Tmall();
             } else if (packageName.equals(Bilibili.PackageName)) {
                 thirdPartyApp = new Bilibili();
+            } else if (packageName.equals(DouyinLite.PackageName)) {
+                thirdPartyApp = new DouyinLite();
+            } else if (packageName.equals(DouyinLive.PackageName)) {
+                thirdPartyApp = new DouyinLive();
+            } else if (packageName.equals(DouyinVideo.PackageName)) {
+                thirdPartyApp = new DouyinVideo();
+            } else if (packageName.equals(DouyinMall.PackageName)) {
+                thirdPartyApp = new DouyinMall();
             }
 
             if (thirdPartyApp != null) {

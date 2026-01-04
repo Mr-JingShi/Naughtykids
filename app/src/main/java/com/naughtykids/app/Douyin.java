@@ -1,5 +1,6 @@
 package com.naughtykids.app;
 
+import android.app.UiAutomation;
 import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,8 +22,6 @@ class Douyin extends ThirdPartyApp {
     private static final String TalkSomethingAndJoin = "说点什么，参与聊话题...";
     private static final String Xiaoxinxin = "小心心";
     private static final String Liwu = "礼物";
-    private static final String DouyinLiveGift_Xiaoxinxin = "DouyinLiveGift_Xiaoxinxin";
-    private static final String DouyinLiveGift_Liwu = "DouyinLiveGift_Liwu";
     private final List<String> mLiveGift = new ArrayList<>();
     private final List<String> mChecksText = new ArrayList<>();
     private String mResId_XiaoXinXin;
@@ -48,8 +47,8 @@ class Douyin extends ThirdPartyApp {
         String versionNameInPreferences = PrivatePreferences.getString(packageName, "");
         Log.d(TAG, "versionName:" + versionName + " versionNameInPreferences:" + versionNameInPreferences);
         if (versionNameInPreferences.equals(versionName)) {
-            mResId_XiaoXinXin = PrivatePreferences.getString(DouyinLiveGift_Xiaoxinxin, "");
-            mResId_Liwu = PrivatePreferences.getString(DouyinLiveGift_Liwu, "");
+            mResId_XiaoXinXin = PrivatePreferences.getString(getLiveGiftXiaoxinxin(), "");
+            mResId_Liwu = PrivatePreferences.getString(getLiveGiftLiwu(), "");
         } else {
             PrivatePreferences.putString(packageName, versionName);
             mResId_XiaoXinXin = null;
@@ -62,12 +61,20 @@ class Douyin extends ThirdPartyApp {
         return PackageName;
     }
 
+    public String getLivePlayActivity() {
+        return LivePlayActivity;
+    }
+
+    public String getLiveGiftXiaoxinxin() {
+        return getPackageName() + "." + Xiaoxinxin;
+    }
+    public String getLiveGiftLiwu() {
+        return getPackageName() + "." + Liwu;
+    }
+
     @Override
     public void onAccessibilityEvent(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event) {
         switch (event.getEventType()) {
-            case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
-                onWindowContentChanged(rootNodeInfo);
-                break;
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
                 onWindowStateChanged(rootNodeInfo, event);
                 break;
@@ -81,15 +88,6 @@ class Douyin extends ThirdPartyApp {
         }
     }
 
-    private void onWindowContentChanged(AccessibilityNodeInfo rootNodeInfo) {
-        for (String text : mChecksText) {
-            if (findNodeByValue(rootNodeInfo, text)) {
-                OverlayWindowManager.getInstance().show();
-                break;
-            }
-        }
-    }
-
     private void onWindowStateChanged(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event) {
         CharSequence className = event.getClassName();
         if (className == null) {
@@ -99,8 +97,9 @@ class Douyin extends ThirdPartyApp {
         Log.d(TAG, "onWindowStateChanged className:" + className);
         if (className.equals(LiveStandardSheetDialog)) {
             OverlayWindowManager.getInstance().show();
-        } else if (className.equals(LivePlayActivity)) {
+        } else if (className.equals(getLivePlayActivity())) {
             mInnerLivePlayActivity = true;
+            Log.d(TAG, "onWindowStateChanged mResId_XiaoXinXin:" + mResId_XiaoXinXin + " mResId_Liwu:" + mResId_Liwu);
             if (!TextUtils.isEmpty(mResId_XiaoXinXin) && !TextUtils.isEmpty(mResId_Liwu)) {
                 overlayNodebyKey(rootNodeInfo, mResId_XiaoXinXin);
                 overlayNodebyKey(rootNodeInfo, mResId_Liwu);
@@ -146,61 +145,6 @@ class Douyin extends ThirdPartyApp {
         }
     }
 
-    private boolean findNode(AccessibilityNodeInfo rootNodeInfo, String key, String value) {
-        boolean keyEmpty = key == null || key.isEmpty();
-        boolean valueEmpty = value == null || value.isEmpty();
-        if (keyEmpty || valueEmpty) {
-            if (valueEmpty) {
-                return findNodeByValue(rootNodeInfo, key);
-            } else {
-                return findNodeByKey(rootNodeInfo, value);
-            }
-        }
-        return findNodeByKeyAndValue(rootNodeInfo, key, value);
-    }
-
-    private static boolean findNodeByKeyAndValue(AccessibilityNodeInfo rootNodeInfo, String key, String value) {
-        Log.v(TAG, "findNodeByKeyAndValue key:" + key + " value:" + value);
-        List<AccessibilityNodeInfo> nodeInfos = rootNodeInfo.findAccessibilityNodeInfosByViewId(key);
-        if (nodeInfos == null) {
-            Log.v(TAG, "nodeInfos == null");
-            return false;
-        }
-        Log.v(TAG, "找到 key:" + key);
-        for (AccessibilityNodeInfo nodeInfo : nodeInfos) {
-            List<AccessibilityNodeInfo> sonNodeInfos = nodeInfo.findAccessibilityNodeInfosByText(value);
-            if (sonNodeInfos == null) {
-                Log.v(TAG, "sonNodeInfos == null");
-                return false;
-            }
-            for (AccessibilityNodeInfo sonNodeInfo : sonNodeInfos) {
-                if (sonNodeInfo.isVisibleToUser()/* && sonNodeInfo.isClickable()*/) {
-                    Log.v(TAG, "找到 value:" + value);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private static boolean findNodeByKey(AccessibilityNodeInfo rootNodeInfo, String key) {
-        List<AccessibilityNodeInfo> nodeInfos = rootNodeInfo.findAccessibilityNodeInfosByViewId(key);
-        if (nodeInfos == null) {
-            Log.v(TAG, "nodeInfos == null");
-            return false;
-        }
-        return !nodeInfos.isEmpty();
-    }
-
-    private static boolean findNodeByValue(AccessibilityNodeInfo rootNodeInfo, String value) {
-        List<AccessibilityNodeInfo> nodeInfos = rootNodeInfo.findAccessibilityNodeInfosByText(value);
-        if (nodeInfos == null) {
-            Log.v(TAG, "sonNodeInfos == null");
-            return false;
-        }
-        return !nodeInfos.isEmpty();
-    }
-
     boolean findNodeByContentDescription(AccessibilityNodeInfo rootNode, List<String> descriptions, List<AccessibilityNodeInfo> nodeInfos) {
         if (rootNode == null) return false;
 
@@ -218,10 +162,10 @@ class Douyin extends ThirdPartyApp {
                         nodeInfos.add(rootNode);
                         if (contentDescription.equals(Xiaoxinxin)) {
                             mResId_XiaoXinXin = viewIdResourceName;
-                            PrivatePreferences.putString(DouyinLiveGift_Xiaoxinxin, viewIdResourceName);
+                            PrivatePreferences.putString(getLiveGiftXiaoxinxin(), viewIdResourceName);
                         } else if (contentDescription.equals(Liwu)) {
                             mResId_Liwu = viewIdResourceName;
-                            PrivatePreferences.putString(DouyinLiveGift_Liwu, viewIdResourceName);
+                            PrivatePreferences.putString(getLiveGiftLiwu(), viewIdResourceName);
                         }
                         if (nodeInfos.size() == descriptions.size()) {
                             return true;
@@ -253,10 +197,10 @@ class Douyin extends ThirdPartyApp {
 
                         if (contentDescription.equals(Xiaoxinxin)) {
                             mResId_XiaoXinXin = viewIdResourceName;
-                            PrivatePreferences.putString(DouyinLiveGift_Xiaoxinxin, viewIdResourceName);
+                            PrivatePreferences.putString(getLiveGiftXiaoxinxin(), viewIdResourceName);
                         } else if (contentDescription.equals(Liwu)) {
                             mResId_Liwu = viewIdResourceName;
-                            PrivatePreferences.putString(DouyinLiveGift_Liwu, viewIdResourceName);
+                            PrivatePreferences.putString(getLiveGiftLiwu(), viewIdResourceName);
                         }
 
                         if (nodeInfos.size() == descriptions.size()) {
