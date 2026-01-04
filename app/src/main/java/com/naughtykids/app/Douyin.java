@@ -134,14 +134,17 @@ class Douyin extends ThirdPartyApp {
     }
 
     private void onViewClicked(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event) {
-        AccessibilityNodeInfo source = event.getSource();
-        if (source == null) {
-            Log.v(TAG, "source == null");
+        CharSequence className = event.getClassName();
+        if (className == null) {
+            Log.v(TAG, "className == null");
             return;
         }
-        String viewId = source.getViewIdResourceName();
-        if (viewId != null) {
-            Log.d("Click", "View ID: " + viewId);
+        Log.d(TAG, "onViewClicked className:" + className);
+        if (className.equals(AndroidWidgetTextView)) {
+            List<CharSequence> texts = event.getText();
+            if (texts.contains(TalkSomething) || texts.contains(TalkSomethingAndJoin)) {
+                OverlayWindowManager.getInstance().smallHide();
+            }
         }
     }
 

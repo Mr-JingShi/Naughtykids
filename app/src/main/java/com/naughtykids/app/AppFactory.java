@@ -53,6 +53,8 @@ final class AppFactory {
                 thirdPartyApp = new DouyinMall();
             } else if (packageName.equals(XiaoHongShu.PackageName)) {
                 thirdPartyApp = new XiaoHongShu();
+            } else if (packageName.equals(XiGuaVideo.PackageName)) {
+                thirdPartyApp = new XiGuaVideo();
             }
 
             if (thirdPartyApp != null) {
