@@ -3,10 +3,10 @@ plugins {
 }
 
 android {
-    namespace 'com.naughtykids.app'
+    namespace 'com.naughtykids.sample'
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.naughtykids.app"
+        applicationId "com.naughtykids.sample"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
