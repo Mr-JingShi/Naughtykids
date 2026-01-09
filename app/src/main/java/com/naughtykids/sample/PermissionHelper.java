@@ -20,6 +20,9 @@ import androidx.annotation.RequiresApi;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 权限工具类
+ */
 public class PermissionHelper {
     private static final String TAG = "PermissionHelper";
     public static final int REQ_CODE_MIN = 1001;
@@ -28,40 +31,36 @@ public class PermissionHelper {
     public static final int REQ_CODE_BATTERY = REQ_CODE_MIN + 2;
     public static final int REQ_CODE_ACCESSIBILITY = REQ_CODE_MIN + 3;
     public static final int REQ_CODE_MAX = REQ_CODE_MIN + 4;
-    private final Activity mActivity;
-    private int mRequestCode = REQ_CODE_MIN;
-    public PermissionHelper(Activity activity) {
-        this.mActivity = activity;
-    }
+    private static int mRequestCode = REQ_CODE_MIN;
 
-    public void requestPermissions() {
+    public static void requestPermissions(Activity activity) {
         for (int i = mRequestCode; i < REQ_CODE_MAX; i++, mRequestCode++) {
             boolean hasPermission = true;
             switch (mRequestCode) {
                 case REQ_CODE_NOTIFICATION:
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        if (!hasNotificationPermission()) {
+                        if (!hasNotificationPermission(activity)) {
                             hasPermission = false;
-                            requestNotificationPermission();
+                            requestNotificationPermission(activity);
                         }
                     }
                     break;
                 case REQ_CODE_OVERLAY:
-                    if (!hasOverlayPermission()) {
+                    if (!hasOverlayPermission(activity)) {
                         hasPermission = false;
-                        requestOverlayPermission();
+                        requestOverlayPermission(activity);
                     }
                     break;
                 case REQ_CODE_BATTERY:
-                    if (!hasBatteryOptimization()) {
+                    if (!hasBatteryOptimization(activity)) {
                         hasPermission = false;
-                        requestIgnoreBatteryOptimization();
+                        requestIgnoreBatteryOptimization(activity);
                     }
                     break;
                 case REQ_CODE_ACCESSIBILITY:
-                    if (!isAccessibilityEnabled()) {
+                    if (!isAccessibilityEnabled(activity)) {
                         hasPermission = false;
-                        requestAccessibilityPermission();
+                        requestAccessibilityPermission(activity);
                     }
                     break;
                 default:
@@ -72,83 +71,83 @@ public class PermissionHelper {
             }
         }
     }
-    private void requestNext() {
+    private static void requestNext(Activity activity) {
         mRequestCode++;
-        requestPermissions();
+        requestPermissions(activity);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    public boolean hasNotificationPermission() {
-        return mActivity.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+    public static boolean hasNotificationPermission(Activity activity) {
+        return activity.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
     }
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    public void requestNotificationPermission() {
-        if (mActivity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+    public static void requestNotificationPermission(Activity activity) {
+        if (activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
             Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-            intent.putExtra(Settings.EXTRA_APP_PACKAGE, mActivity.getPackageName());
-            dialog("通知", intent, REQ_CODE_NOTIFICATION);
+            intent.putExtra(Settings.EXTRA_APP_PACKAGE, activity.getPackageName());
+            dialog(activity, "通知", intent, REQ_CODE_NOTIFICATION);
         } else {
-            mActivity.requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQ_CODE_NOTIFICATION);
+            activity.requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQ_CODE_NOTIFICATION);
         }
     }
 
-    private boolean hasOverlayPermission() {
-        return Settings.canDrawOverlays(mActivity);
+    private static boolean hasOverlayPermission(Activity activity) {
+        return Settings.canDrawOverlays(activity);
     }
 
-    public void requestOverlayPermission() {
+    public static void requestOverlayPermission(Activity activity) {
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-        intent.setData(Uri.parse("package:" + mActivity.getPackageName()));
-        dialog("悬浮窗", intent, REQ_CODE_OVERLAY);
+        intent.setData(Uri.parse("package:" + activity.getPackageName()));
+        dialog(activity, "悬浮窗", intent, REQ_CODE_OVERLAY);
     }
 
-    private boolean hasBatteryOptimization() {
-        final PowerManager pm = (PowerManager) mActivity.getSystemService(Context.POWER_SERVICE);
-        return pm.isIgnoringBatteryOptimizations(mActivity.getPackageName());
+    private static boolean hasBatteryOptimization(Activity activity) {
+        final PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+        return pm.isIgnoringBatteryOptimizations(activity.getPackageName());
     }
 
-    public void requestIgnoreBatteryOptimization() {
+    public static void requestIgnoreBatteryOptimization(Activity activity) {
         Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-        intent.setData(Uri.parse("package:" + mActivity.getPackageName()));
-        dialog("忽略电池优化", intent, REQ_CODE_BATTERY);
+        intent.setData(Uri.parse("package:" + activity.getPackageName()));
+        dialog(activity, "忽略电池优化", intent, REQ_CODE_BATTERY);
     }
 
-    private boolean isAccessibilityEnabled() {
-        AccessibilityManager am = (AccessibilityManager) mActivity.getSystemService(Context.ACCESSIBILITY_SERVICE);
+    private static boolean isAccessibilityEnabled(Activity activity) {
+        AccessibilityManager am = (AccessibilityManager) activity.getSystemService(Context.ACCESSIBILITY_SERVICE);
         List<AccessibilityServiceInfo> enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC);
         for (AccessibilityServiceInfo service : enabledServices) {
-            if (service.getId().contains(mActivity.getPackageName())) {
+            if (service.getId().contains(activity.getPackageName())) {
                 return true;
             }
         }
         return false;
     }
 
-    private void requestAccessibilityPermission()  {
+    private static void requestAccessibilityPermission(Activity activity)  {
         Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-        dialog("无障碍服务", intent, REQ_CODE_ACCESSIBILITY);
+        dialog(activity, "无障碍服务", intent, REQ_CODE_ACCESSIBILITY);
     }
 
-    private void dialog(String message, Intent intent, int requestCode) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+    private static void dialog(Activity activity, String message, Intent intent, int requestCode) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(String.format("请授权%s权限", message));
         builder.setMessage(String.format("熊孩子应用需要%s权限才能正常运行", message));
         builder.setPositiveButton("确定", (dialog, which) -> {
-            mActivity.startActivityForResult(intent, requestCode);
+            activity.startActivityForResult(intent, requestCode);
         });
         builder.setNegativeButton("取消", (dialog, which) -> {
-            Toast.makeText(mActivity, String.format("请授予%s权限", message), Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, String.format("请授予%s权限", message), Toast.LENGTH_LONG).show();
         });
         builder.show();
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public static void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         Log.i(TAG, "onActivityResult requestCode:" + requestCode + " resultCode:" + resultCode + " data:" + data);
-        requestNext();
+        requestNext(activity);
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public static void onRequestPermissionsResult(Activity activity, int requestCode, String[] permissions, int[] grantResults) {
         Log.i(TAG, "onRequestPermissionsResult requestCode:" + requestCode + " permissions:" + Arrays.toString(permissions) + " grantResults:" + Arrays.toString(grantResults));
-        requestNext();
+        requestNext(activity);
     }
 }

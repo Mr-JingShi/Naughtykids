@@ -14,30 +14,12 @@ import androidx.core.app.ActivityCompat;
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
     private static String TAG = "MainActivity";
 
-    PermissionHelper permissionHelper = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "MainActivity onCreate");
         super.onCreate(savedInstanceState);
 
-        // Java
-        PackageManager pm = getPackageManager();
-        try {
-            PackageInfo packageInfo = pm.getPackageInfo(getPackageName(),
-                    PackageManager.GET_PERMISSIONS);
-            String[] requestedPermissions = packageInfo.requestedPermissions;
-            Log.d("Permission", "Requested: " + requestedPermissions);
-            if (requestedPermissions != null) {
-                for (String permission : requestedPermissions) {
-                    Log.d("Permission", "Requested: " + permission + " " + this.checkSelfPermission(permission));
-                }
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        permissionHelper = new PermissionHelper(this);
-        permissionHelper.requestPermissions();
+        PermissionHelper.requestPermissions(this);
     }
 
     @Override
@@ -61,12 +43,12 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionHelper.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        permissionHelper.onActivityResult(requestCode, resultCode, data);
+        PermissionHelper.onActivityResult(this, requestCode, resultCode, data);
     }
 }
