@@ -43,11 +43,8 @@ public class OverlayManager {
         mWindowManager = (WindowManager) Utils.getA11y().getSystemService(Context.WINDOW_SERVICE);
 
         mFullScreenParams = createLayoutParams();
-        Display display = mWindowManager.getDefaultDisplay();
-        DisplayMetrics realMetrics = new DisplayMetrics();
-        display.getRealMetrics(realMetrics);
-        mFullScreenParams.width = realMetrics.widthPixels;
-        mFullScreenParams.height = realMetrics.heightPixels;
+        mFullScreenParams.width = ScreeHelper.getScreenWidth();
+        mFullScreenParams.height = ScreeHelper.getScreenHeight();
 
         mFullScreenView = createView();
         mFullScreenView.setBackgroundColor(Color.LTGRAY);
@@ -160,5 +157,14 @@ public class OverlayManager {
         params.alpha = 1.0f;
         params.gravity = Gravity.TOP | Gravity.START;
         return params;
+    }
+
+    public void onScreenRotation() {
+        Log.i(TAG, "onScreenRotation");
+        if (mFullScreenViewShowing) {
+            mFullScreenParams.width = ScreeHelper.getScreenWidth();
+            mFullScreenParams.height = ScreeHelper.getScreenHeight();
+            mWindowManager.addView(mFullScreenView, mFullScreenParams);
+        }
     }
 }
