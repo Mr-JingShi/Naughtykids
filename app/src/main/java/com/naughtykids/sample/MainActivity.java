@@ -1,8 +1,10 @@
 package com.naughtykids.sample;
 
+import android.Manifest;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -18,6 +20,11 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "MainActivity onCreate");
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
+
+        findViewById(R.id.hideAppIcon).setOnClickListener(v -> Utils.toggleAppIcon(false));
+        findViewById(R.id.showAppIcon).setOnClickListener(v ->  Utils.toggleAppIcon(true));
 
         PermissionHelper.requestPermissions(this);
     }

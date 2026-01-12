@@ -67,11 +67,15 @@ public final class AppFactory {
                 thirdPartyApp = new AliPay();
             } else if (packageName.equals(DangDang.PackageName)) {
                 thirdPartyApp = new DangDang();
+            } else {
+                packageName = "unkown";
+                thirdPartyApp = mThirdPartyApps.get(packageName);
+                if (thirdPartyApp == null) {
+                    thirdPartyApp = new UnkownApp();
+                }
             }
 
-            if (thirdPartyApp != null) {
-                mThirdPartyApps.put(packageName, thirdPartyApp);
-            }
+            mThirdPartyApps.put(packageName, thirdPartyApp);
         }
         return thirdPartyApp;
     }

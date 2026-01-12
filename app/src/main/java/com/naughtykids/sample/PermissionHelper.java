@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class PermissionHelper {
     private static final String TAG = "PermissionHelper";
-    public static final int REQ_CODE_MIN = 1001;
+    public static final int REQ_CODE_MIN = 1000;
     public static final int REQ_CODE_NOTIFICATION = REQ_CODE_MIN;
     public static final int REQ_CODE_OVERLAY = REQ_CODE_MIN + 1;
     public static final int REQ_CODE_BATTERY = REQ_CODE_MIN + 2;
@@ -98,6 +98,7 @@ public class PermissionHelper {
     public static void requestOverlayPermission(Activity activity) {
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
         intent.setData(Uri.parse("package:" + activity.getPackageName()));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialog(activity, "悬浮窗", intent, REQ_CODE_OVERLAY);
     }
 
@@ -125,6 +126,7 @@ public class PermissionHelper {
 
     private static void requestAccessibilityPermission(Activity activity)  {
         Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialog(activity, "无障碍服务", intent, REQ_CODE_ACCESSIBILITY);
     }
 
@@ -137,6 +139,7 @@ public class PermissionHelper {
         });
         builder.setNegativeButton("取消", (dialog, which) -> {
             Toast.makeText(activity, String.format("请授予%s权限", message), Toast.LENGTH_LONG).show();
+            requestNext(activity);
         });
         builder.show();
     }

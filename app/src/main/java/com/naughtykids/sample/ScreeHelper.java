@@ -26,6 +26,7 @@ class ScreeHelper {
 
             @Override
             public void onDisplayChanged(int displayId) {
+                Log.i(TAG, "onDisplayChanged displayId: " + displayId);
                 if (displayId == Display.DEFAULT_DISPLAY) {
                     if (setScreenSize(displayManager)) {
                         OverlayManager.getInstance().onScreenRotation();

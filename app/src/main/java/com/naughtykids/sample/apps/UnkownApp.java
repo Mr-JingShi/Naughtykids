@@ -4,13 +4,12 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.naughtykids.sample.OverlayManager;
 import com.naughtykids.sample.Utils;
 
 import java.util.List;
 
-class DesktopApp extends ThirdPartyApp {
-    private static final String TAG = "DestinyApp";
+class UnkownApp extends ThirdPartyApp {
+    private static final String TAG = "UnkownApp";
 
     @Override
     public String getPackageName() {
@@ -19,20 +18,11 @@ class DesktopApp extends ThirdPartyApp {
     @Override
     public void onAccessibilityEvent(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event) {
         switch (event.getEventType()) {
-            case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-                onWindowStateChanged();
-                break;
             case AccessibilityEvent.TYPE_VIEW_CLICKED:
                 onViewClicked(rootNodeInfo, event);
                 break;
             default:
                 break;
-        }
-    }
-
-    private void onWindowStateChanged() {
-        if (!Utils.hasApplicationWindow()) {
-            OverlayManager.getInstance().smallHide();
         }
     }
 
@@ -43,26 +33,16 @@ class DesktopApp extends ThirdPartyApp {
             return;
         }
         Log.d(TAG, "onViewClicked className:" + className);
-        if (className.equals(AndroidWidgetTextView)) {
-            CharSequence contentDescription = event.getContentDescription();
-            if (contentDescription == null) {
-                Log.d(TAG, "onViewClicked contentDescription == null");
-                return;
-            }
+        if (className.equals(AndroidViewGroup)) {
             List<CharSequence> texts = event.getText();
             if (texts.isEmpty()) {
                 Log.d(TAG, "onViewClicked texts is Empty");
                 return;
             }
-            if (contentDescription.equals(Utils.getSelfAppName()) && texts.get(0).equals(Utils.getSelfAppName())) {
+            String text = texts.get(0).toString();
+            if (text.equals(Utils.getSelfAppName())) {
                 Log.d(TAG, "onViewClicked " + Utils.getSelfAppName());
                 Utils.toggleAppIcon(true);
-            } else if (contentDescription.equals(Kwai.AppName) && texts.get(0).equals(Kwai.AppName)) {
-                Log.d(TAG, "onViewClicked 快手");
-                checkVersion(Kwai.PackageName);
-            } else if (contentDescription.equals(Douyin.AppName) && texts.get(0).equals(Douyin.AppName)) {
-                Log.d(TAG, "onViewClicked 抖音");
-                checkVersion(Douyin.PackageName);
             }
         }
     }

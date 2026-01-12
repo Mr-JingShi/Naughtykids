@@ -1,10 +1,12 @@
 package com.naughtykids.sample;
 
 import android.accessibilityservice.AccessibilityService;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
@@ -14,24 +16,19 @@ import java.util.List;
 public class Utils {
     private static final String TAG = "Utils";
     private static AccessibilityService mA11y;
-
     private static String mDesktopAppPackageName;
     private static String mSelfAppPackageName;
+    private static String mSelfAppName;
+    private static boolean mIsAppIconShown = true;
 
     static void setA11y(AccessibilityService a11y) {
         mA11y = a11y;
 
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        ResolveInfo resolveInfo = a11y.getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-
-        if (resolveInfo != null && resolveInfo.activityInfo != null) {
-            mDesktopAppPackageName = resolveInfo.activityInfo.packageName;
-            Log.d(TAG, "DesktopAppPackageName:" + mDesktopAppPackageName);
-        }
+        getDesktopApp();
 
         mSelfAppPackageName = a11y.getPackageName();
-        Log.d(TAG, "SelfAppPackageName:" + mSelfAppPackageName);
+        mSelfAppName = a11y.getPackageManager().getApplicationLabel(a11y.getApplicationInfo()).toString();
+        Log.d(TAG, "SelfAppPackageName:" + mSelfAppPackageName + " SelfAppName:" + mSelfAppName);
     }
 
     static AccessibilityService getA11y() {
@@ -44,6 +41,20 @@ public class Utils {
 
     static String getSelfAppPackageName() {
         return mSelfAppPackageName;
+    }
+    public static String getSelfAppName() {
+        return mSelfAppName;
+    }
+
+    private static void getDesktopApp() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo resolveInfo = mA11y.getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+        if (resolveInfo != null && resolveInfo.activityInfo != null) {
+            mDesktopAppPackageName = resolveInfo.activityInfo.packageName;
+            Log.d(TAG, "DesktopAppPackageName:" + mDesktopAppPackageName);
+        }
     }
 
     public static String getAppVersion(String app) {
@@ -92,6 +103,17 @@ public class Utils {
         for (int i = 0; i < clickBackCount; i++) {
             AccessibilityService service = Utils.getA11y();
             service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+        }
+    }
+
+    public static void toggleAppIcon(boolean show) {
+        if (mIsAppIconShown != show) {
+            mIsAppIconShown = show;
+            mA11y.getPackageManager().setComponentEnabledSetting(
+                    new ComponentName(mA11y, MainActivity.class),
+                    show ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP
+            );
         }
     }
 }

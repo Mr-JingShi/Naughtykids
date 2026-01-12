@@ -10,6 +10,7 @@ public abstract class ThirdPartyApp {
     static final String AndroidWidgetTextView = "android.widget.TextView";
     static final String AndroidWidgetFrameLayout = "android.widget.FrameLayout";
     static final String AndroidWidgetLinearLayout = "android.widget.LinearLayout";
+    static final String AndroidViewGroup = "android.view.ViewGroup";
 
     abstract String getPackageName();
     public abstract void onAccessibilityEvent(AccessibilityNodeInfo rootNodeInfo, AccessibilityEvent event);
