@@ -28,7 +28,6 @@ public class OverlayManager {
     private WindowManager.LayoutParams mSmallParams;
     private boolean mFullScreenViewShowing = false;
     private final int[] mViewLocation = new int[2];
-
     private static class Holder {
         private static final OverlayManager mInstance = new OverlayManager();
     }
@@ -143,9 +142,7 @@ public class OverlayManager {
 
     private static WindowManager.LayoutParams createLayoutParams() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        params.type = Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP
-                ? WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
-                : WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
+        params.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
         params.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                 | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE

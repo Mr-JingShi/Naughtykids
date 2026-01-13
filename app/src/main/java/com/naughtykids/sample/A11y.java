@@ -59,6 +59,7 @@ public class A11y extends AccessibilityService {
 
         Utils.setA11y(this);
         ScreeHelper.rotationListener();
+        Authentication.getInstance().init();
         OverlayManager.getInstance().init();
     }
 

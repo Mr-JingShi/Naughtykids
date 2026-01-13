@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         setContentView(R.layout.activity_main);
 
         findViewById(R.id.hideAppIcon).setOnClickListener(v -> Utils.toggleAppIcon(false));
-        findViewById(R.id.showAppIcon).setOnClickListener(v ->  Utils.toggleAppIcon(true));
 
         PermissionHelper.requestPermissions(this);
     }

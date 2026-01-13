@@ -98,7 +98,7 @@ public class PermissionHelper {
     public static void requestOverlayPermission(Activity activity) {
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
         intent.setData(Uri.parse("package:" + activity.getPackageName()));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         dialog(activity, "悬浮窗", intent, REQ_CODE_OVERLAY);
     }
 
@@ -126,7 +126,7 @@ public class PermissionHelper {
 
     private static void requestAccessibilityPermission(Activity activity)  {
         Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         dialog(activity, "无障碍服务", intent, REQ_CODE_ACCESSIBILITY);
     }
 
@@ -141,6 +141,7 @@ public class PermissionHelper {
             Toast.makeText(activity, String.format("请授予%s权限", message), Toast.LENGTH_LONG).show();
             requestNext(activity);
         });
+        builder.setCancelable(false);
         builder.show();
     }
 

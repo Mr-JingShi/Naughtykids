@@ -108,12 +108,19 @@ public class Utils {
 
     public static void toggleAppIcon(boolean show) {
         if (mIsAppIconShown != show) {
-            mIsAppIconShown = show;
-            mA11y.getPackageManager().setComponentEnabledSetting(
-                    new ComponentName(mA11y, MainActivity.class),
-                    show ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP
-            );
+            Authentication.getInstance().show("ABCDEF", result -> {
+                mIsAppIconShown = show;
+                mA11y.getPackageManager().setComponentEnabledSetting(
+                        new ComponentName(mA11y, MainActivity.class),
+                        show ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                        PackageManager.DONT_KILL_APP
+                );
+
+                Intent home = new Intent(Intent.ACTION_MAIN);
+                home.addCategory(Intent.CATEGORY_HOME);
+                home.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mA11y.startActivity(home);
+            });
         }
     }
 }

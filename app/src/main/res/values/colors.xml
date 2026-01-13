@@ -1,0 +1,5 @@
+<resources>
+    <color name="btn_default_normal">#F2F2F2</color>      <!-- 浅灰色 -->
+    <color name="btn_default_pressed">#D9D9D9</color>     <!-- 按压时稍暗 -->
+    <color name="btn_default_text">#333333</color>        <!-- 深灰色文字 -->
+</resources>

@@ -14,23 +14,11 @@
         android:textColor="#FFA500"
         android:text="Naughtykids"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
     <Button
         android:id="@+id/hideAppIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="隐藏应用图标"
         android:layout_gravity="center" />
-
-    <Button
-        android:id="@+id/showAppIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="显示应用图标"
-        android:layout_gravity="center" />
-    </LinearLayout>
 
 </FrameLayout>
