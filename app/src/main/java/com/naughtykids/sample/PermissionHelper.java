@@ -131,18 +131,22 @@ public class PermissionHelper {
     }
 
     private static void dialog(Activity activity, String message, Intent intent, int requestCode) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle(String.format("请授权%s权限", message));
-        builder.setMessage(String.format("熊孩子应用需要%s权限才能正常运行", message));
-        builder.setPositiveButton("确定", (dialog, which) -> {
-            activity.startActivityForResult(intent, requestCode);
-        });
-        builder.setNegativeButton("取消", (dialog, which) -> {
-            Toast.makeText(activity, String.format("请授予%s权限", message), Toast.LENGTH_LONG).show();
-            requestNext(activity);
-        });
-        builder.setCancelable(false);
-        builder.show();
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
+            .setTitle(String.format("请授权%s权限", message))
+            .setMessage(String.format("熊孩子应用需要%s权限才能正常运行", message))
+            .setPositiveButton("确定", (dialog, which) -> {
+                activity.startActivityForResult(intent, requestCode);
+                dialog.dismiss();
+            })
+            .setNegativeButton("取消", (dialog, which) -> {
+                Toast.makeText(activity, String.format("请授予%s权限", message), Toast.LENGTH_LONG).show();
+                requestNext(activity);
+                dialog.dismiss();
+            })
+            .setCancelable(false)
+            .create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.show();
     }
 
     public static void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {

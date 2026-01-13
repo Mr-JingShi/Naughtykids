@@ -11,6 +11,10 @@ public class PrivatePreferences {
         return Utils.getA11y().getSharedPreferences(TAG, android.content.Context.MODE_PRIVATE);
     }
 
+    private static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences(TAG, android.content.Context.MODE_PRIVATE);
+    }
+
     private static void saveRect(String key, Rect rect) {
         // 格式: "left,top,right,bottom"
         String str = rect.left + "," + rect.top + "," + rect.right + "," + rect.bottom;
@@ -48,6 +52,10 @@ public class PrivatePreferences {
         return getSharedPreferences().getBoolean(key, defaultValue);
     }
 
+    static boolean getBoolean(Context context, String key, boolean defaultValue) {
+        return getSharedPreferences(context).getBoolean(key, defaultValue);
+    }
+
     static int getInt(String key, int defaultValue) {
         return getSharedPreferences().getInt(key, defaultValue);
     }
@@ -58,6 +66,10 @@ public class PrivatePreferences {
 
     static void putBoolean(String key, Boolean value) {
         getSharedPreferences().edit().putBoolean(key, value).apply();
+    }
+
+    static void putBoolean(Context context, String key, boolean value) {
+        getSharedPreferences(context).edit().putBoolean(key, value).apply();
     }
 
     static void putInt(String key, int value) {

@@ -1,10 +1,7 @@
 package com.naughtykids.sample;
 
-import android.Manifest;
-import android.content.ComponentName;
+import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,6 +12,7 @@ import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
     private static String TAG = "MainActivity";
+    private static final String DISCLAYER = "disclaimer";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +23,12 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
         findViewById(R.id.hideAppIcon).setOnClickListener(v -> Utils.toggleAppIcon(false));
 
-        PermissionHelper.requestPermissions(this);
+        // 免责弹窗
+        if (PrivatePreferences.getBoolean(this, DISCLAYER, true)) {
+            disclaimer();
+        } else {
+            PermissionHelper.requestPermissions(MainActivity.this);
+        }
     }
 
     @Override
@@ -56,5 +59,24 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         PermissionHelper.onActivityResult(this, requestCode, resultCode, data);
+    }
+
+    private void disclaimer() {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.disclaimer_title)
+                .setMessage(R.string.disclaimer)
+                .setPositiveButton(R.string.disclaimer_confirm, (dialog, which) -> {
+                    PermissionHelper.requestPermissions(MainActivity.this);
+                    dialog.dismiss();
+                })
+                .setNegativeButton(R.string.disclaimer_cancel, (dialog, which) -> {
+                    PrivatePreferences.putBoolean(MainActivity.this, DISCLAYER, false);
+                    PermissionHelper.requestPermissions(MainActivity.this);
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.show();
     }
 }

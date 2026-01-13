@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
@@ -107,19 +106,20 @@ public class Utils {
     }
 
     public static void toggleAppIcon(boolean show) {
-        if (mIsAppIconShown != show) {
+        PackageManager pm = mA11y.getPackageManager();
+        ComponentName componentName = new ComponentName(mA11y, MainActivity.class);
+        boolean enable = pm.getComponentEnabledSetting(componentName) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+        if (enable != show) {
             Authentication.getInstance().show("ABCDEF", result -> {
-                mIsAppIconShown = show;
-                mA11y.getPackageManager().setComponentEnabledSetting(
-                        new ComponentName(mA11y, MainActivity.class),
+                pm.setComponentEnabledSetting(
+                        componentName,
                         show ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                         PackageManager.DONT_KILL_APP
                 );
 
-                Intent home = new Intent(Intent.ACTION_MAIN);
-                home.addCategory(Intent.CATEGORY_HOME);
-                home.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mA11y.startActivity(home);
+                if (show) {
+                    clickHome();
+                }
             });
         }
     }
