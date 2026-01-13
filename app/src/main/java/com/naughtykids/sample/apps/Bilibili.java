@@ -60,6 +60,8 @@ class Bilibili extends ThirdPartyApp {
                     }
                 }
             }
+        } else {
+            OverlayManager.getInstance().smallHide();
         }
     }
 }

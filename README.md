@@ -10,11 +10,9 @@
 
 # 示例
 
-# 微信
-| 微信红包| 微信直播 |
-| :----------: | :----------: |
-| <img src="doc/img/微信红包.gif" width="200" /> | <img src="doc/img/微信直播.gif" width="200" /> |
-
+| 微信红包 | 微信直播 | 禁止网购App启动 | 禁止直播打赏 |
+| :----------: | :----------: | :----------: | :----------: |
+| <img src="doc/img/微信红包.gif" width="200" /> | <img src="doc/img/微信直播.gif" width="200" /> | <img src="doc/img/禁止网购App启动.gif" width="200" /> | <img src="doc/img/禁止直播打赏.gif" width="200" /> |
 
 # License
 
