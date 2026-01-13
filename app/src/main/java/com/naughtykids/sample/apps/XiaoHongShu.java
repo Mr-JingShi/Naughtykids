@@ -37,7 +37,6 @@ class XiaoHongShu extends ThirdPartyApp {
         Log.d(TAG, "onWindowStateChanged className:" + className);
         if (className.equals(AlphaAudienceActivityV2)) {
             OverlayManager.getInstance().show();
-            OverlayManager.getInstance().clearBackgroundColor();
         }
     }
 }

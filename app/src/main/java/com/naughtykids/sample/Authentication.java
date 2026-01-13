@@ -209,7 +209,8 @@ public class Authentication {
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
             | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-            | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+            | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
+            | WindowManager.LayoutParams.FLAG_SECURE,
             PixelFormat.TRANSLUCENT
         );
         return params;

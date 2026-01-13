@@ -46,7 +46,7 @@ public class OverlayManager {
         mFullScreenParams.height = ScreeHelper.getScreenHeight();
 
         mFullScreenView = createView();
-        mFullScreenView.setBackgroundColor(Color.LTGRAY);
+        mFullScreenView.setBackgroundColor(Color.TRANSPARENT);
         mFullScreenView.setOnClickListener(v -> {
             Log.i(TAG, "onClick");
 
@@ -71,10 +71,6 @@ public class OverlayManager {
     }
     public void setClickBackCount(int count) {
         this.mClickBackCount = count;
-    }
-
-    public void clearBackgroundColor() {
-        mFullScreenView.setBackgroundColor(Color.TRANSPARENT);
     }
 
     public void hide() {

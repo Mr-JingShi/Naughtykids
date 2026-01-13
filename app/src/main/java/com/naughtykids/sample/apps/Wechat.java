@@ -91,7 +91,6 @@ class Wechat extends ThirdPartyApp {
             OverlayManager.getInstance().show();
             OverlayManager.getInstance().setClickBackCount(2);
         } else if (className.equals(FinderLiveVisitorWithoutAffinityUI)) {
-            OverlayManager.getInstance().clearBackgroundColor();
             OverlayManager.getInstance().show();
         } else if (className.equals(MallIndexUIv2)) {
             OverlayManager.getInstance().show();
