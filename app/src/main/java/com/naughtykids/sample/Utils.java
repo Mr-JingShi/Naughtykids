@@ -18,8 +18,6 @@ public class Utils {
     private static String mDesktopAppPackageName;
     private static String mSelfAppPackageName;
     private static String mSelfAppName;
-    private static boolean mIsAppIconShown = true;
-
     static void setA11y(AccessibilityService a11y) {
         mA11y = a11y;
 
@@ -110,7 +108,7 @@ public class Utils {
         ComponentName componentName = new ComponentName(mA11y, MainActivity.class);
         boolean enable = pm.getComponentEnabledSetting(componentName) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
         if (enable != show) {
-            Authentication.getInstance().show("ABCDEF", result -> {
+            Authentication.getInstance().show("AABBCC", result -> {
                 pm.setComponentEnabledSetting(
                         componentName,
                         show ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
